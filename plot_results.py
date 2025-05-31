@@ -34,23 +34,27 @@ def main(argv):
         var: max([s[var] for s in study.values()])
         for var in variables
     }
-    print(averages)
-    print(study)
-    # Now create a plot with one plot per variable in variables
-    n_vars = len(variables)
-    n_cols = 2
-    n_rows = (n_vars + n_cols - 1) // n_cols
-    fig, axs = plt.subplots(n_rows, n_cols, figsize=(12, 6 * n_rows))
-    axs = axs.flatten() if n_rows > 1 else [axs]
-    for i, var in enumerate(variables):
-        values = [s[var] for s in study.values()]
-        # Not a bar chart, but show individual values axs[i].bar(names, values)
-        axs[i].scatter(names, values, label=var)
-        axs[i].set_title(var)
-        axs[i].set_xticklabels(names, rotation=45, ha='right')
-        axs[i].set_ylabel(var)
-        axs[i].set_xlabel('Study Name')
-        axs[i].grid(True)
+
+    # plot outputs against eachother in a single .pdf file to look
+    # for correlations
+    fig, axs = plt.subplots(len(variables), len(variables), figsize=(15, 15))
+    for i, var1 in enumerate(variables):
+        for j, var2 in enumerate(variables):
+            if i == j:
+                continue
+            x = [s[var1] for s in study.values()]
+            y = [s[var2] for s in study.values()]
+            axs[i, j].scatter(x, y)
+            axs[i, j].set_xlabel(var1)
+            axs[i, j].set_ylabel(var2)
+            axs[i, j].set_xlim(0, averages[var1])
+            axs[i, j].set_ylim(0, averages[var2])
+            axs[i, j].set_title(f"{var1} vs {var2}")
+            axs[i, j].grid(True)
+    plt.suptitle("Study Results Correlation Matrix")
+    plt.subplots_adjust(top=0.9, hspace=0.4, wspace=0.4)
+    plt.xticks(rotation=45)
+    plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout to fit suptitle
     plt.tight_layout()
     plt.savefig(output)
 
