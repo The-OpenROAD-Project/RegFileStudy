@@ -14,15 +14,16 @@ compile_pip_requirements(
 )
 
 STUDY = [{
-    "name": "RegFile_{i}_{j}".format(
+    "name": "RegFile_{i}_{j}_{k}".format(
         i = i,
         j = j,
+        k = k,
     ),
-    "width": 4,
-    "rows": 4,
+    "width": 16,
+    "rows": 1 << k,
     "read_ports": 1 << i,
     "write_ports": 1 << j,
-} for i in range(0, 4) for j in range(0, 4)]
+} for i in range(0, 5) for j in range(0, 5) for k in range(0, 5)]
 
 NAMES = [study["name"] for study in STUDY]
 
@@ -85,7 +86,7 @@ genrule(
 [
     orfs_run(
         name = "{base}_results".format(base = name),
-        src = "{name}_floorplan".format(name = name),
+        src = "{name}_cts".format(name = name),
         outs = [
             "{name}_stats".format(name = name),
         ],
