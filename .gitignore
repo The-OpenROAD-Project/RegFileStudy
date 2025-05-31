@@ -16,3 +16,4 @@ bazel-testlogs
 bazel-RegFileStudy
 .bazelbsp
 projectview.bazelproject
+user.bazelrc
