@@ -18,11 +18,11 @@ STUDY = [{
         i = i,
         j = j,
     ),
-    "width": 4,
-    "rows": 4,
+    "width": 32,
+    "rows": 64,
     "read_ports": 1 << i,
     "write_ports": 1 << j,
-} for i in range(0, 4) for j in range(0, 4)]
+} for i, j in ([(0, x) for x in range(0, 6)] +[(x, 0) for x in range(1, 6)])]
 
 NAMES = [study["name"] for study in STUDY]
 
