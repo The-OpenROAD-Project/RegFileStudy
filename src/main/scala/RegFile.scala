@@ -15,25 +15,6 @@ import scopt.RenderingMode
 import scala.collection.immutable.SeqMap
 import java.nio.file.Paths
 
-class RegFileIO(rows: Int, width: Int, readPorts: Int, writePorts: Int)
-    extends Bundle {
-  val reads = Vec(
-    readPorts,
-    new Bundle {
-      val addr = Input(UInt(log2Ceil(rows).W))
-      val data = Output(UInt(width.W))
-    }
-  )
-  val writes = Vec(
-    writePorts,
-    new Bundle {
-      val addr = Input(UInt(log2Ceil(rows).W))
-      val data = Input(UInt(width.W))
-      val en = Input(Bool())
-    }
-  )
-}
-
 case class RegFileConfig(
     val name: String,
     val rows: Int,
@@ -44,15 +25,23 @@ case class RegFileConfig(
 
 class RegFile(config: RegFileConfig) extends Module {
   override def desiredName = config.name
-
-  val io = IO(
-    new RegFileIO(
-      config.rows,
-      config.width,
+  val io = IO(new Bundle {
+    val reads = Vec(
       config.read_ports,
-      config.write_ports
+      new Bundle {
+        val addr = Input(UInt(log2Ceil(config.rows).W))
+        val data = Output(UInt(config.width.W))
+      }
     )
-  )
+    val writes = Vec(
+      config.write_ports,
+      new Bundle {
+        val addr = Input(UInt(log2Ceil(config.rows).W))
+        val data = Input(UInt(config.width.W))
+        val en = Input(Bool())
+      }
+    )
+  })
 
   val mem = SyncReadMem(config.rows, UInt(config.width.W))
   for (read <- io.reads) {
