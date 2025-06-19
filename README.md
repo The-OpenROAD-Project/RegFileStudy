@@ -41,12 +41,28 @@ OpenROAD build targets with `orfs_flow` are set up to build each of the register
 
 Finally `plot_results.py` reads in all the .yaml files written out by `results.tcl` and plots the result above.
 
+## Viewing a register file in OpenROAD
+
+BUILD orfs_flow() is set up to run the flow through CTS, list all route targets:
+
+    $ bazelisk query 'filter("_route$", //...)'
+    [deleted]
+    //:RegFile_2_0_route
+    [deleted]
+
+To view the in OpenROAD GUI, run:
+
+    rm -rf /tmp/route
+    bazelisk run //:RegFile_5_0_route /tmp/route gui_route
+
+![OpenROAD GUI](openroad-gui.png)
+
 ## Dependencies
 
 To set up this study, Bazel downloads and sets up all the required components:
 
-- Chisel
-- OpenROAD
-- OpenROAD-flow-scripts
-- bazel-orfs
-- Verilator (not actually used here, but in a study that includes reading .vcd into OpenSTA it would be used)
+- [Chisel](https://www.chisel-lang.org/)
+- [OpenROAD](https://github.com/The-OpenROAD-Project/OpenROAD)
+- [OpenROAD-flow-scripts](https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts)
+- [bazel-orfs](https://github.com/The-OpenROAD-Project/bazel-orfs)
+- [Verilator](https://www.veripool.org/verilator/) (not actually used here, but in a study that includes reading .vcd into OpenSTA it would be used)
