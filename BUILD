@@ -1,6 +1,6 @@
 load("@bazel-orfs//:openroad.bzl", "orfs_flow", "orfs_run")
 load("@bazel-orfs//:write_binary.bzl", "write_binary")
-load("@openroad_rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@regfilestudy_rules_python//python:pip.bzl", "compile_pip_requirements")
 load("chisel.bzl", "chisel_binary")
 
 #load("@rules_cc//cc:defs.bzl", "cc_binary")
@@ -26,6 +26,7 @@ STUDY = [{
 
 NAMES = [study["name"] for study in STUDY]
 
+# Write out a .jsonfile with the study parameters.
 write_binary(
     name = "study",
     data = str(STUDY),
@@ -37,14 +38,14 @@ chisel_binary(
     main_class = "GenerateRegFileStudy",
     scalacopts = ["-Ytasty-reader"],
     deps = [
-        "@openroad_maven//:com_chuusai_shapeless_2_13",
-        "@openroad_maven//:com_github_scopt_scopt_2_13",
-        "@openroad_maven//:io_circe_circe_core_2_13",
-        "@openroad_maven//:io_circe_circe_generic_2_13",
-        "@openroad_maven//:io_circe_circe_numbers_2_13",
-        "@openroad_maven//:io_circe_circe_yaml_2_13",
-        "@openroad_maven//:io_circe_circe_yaml_common_2_13",
-        "@openroad_maven//:org_typelevel_cats_core_2_13",
+        "@regfilestudy_maven//:com_chuusai_shapeless_2_13",
+        "@regfilestudy_maven//:com_github_scopt_scopt_2_13",
+        "@regfilestudy_maven//:io_circe_circe_core_2_13",
+        "@regfilestudy_maven//:io_circe_circe_generic_2_13",
+        "@regfilestudy_maven//:io_circe_circe_numbers_2_13",
+        "@regfilestudy_maven//:io_circe_circe_yaml_2_13",
+        "@regfilestudy_maven//:io_circe_circe_yaml_common_2_13",
+        "@regfilestudy_maven//:org_typelevel_cats_core_2_13",
     ],
 )
 
@@ -107,8 +108,8 @@ py_binary(
     name = "plot_results",
     srcs = ["plot_results.py"],
     deps = [
-        "@openroad-pip//matplotlib",
-        "@openroad-pip//pyyaml",
+        "@regfilestudy-pip//matplotlib",
+        "@regfilestudy-pip//pyyaml",
     ],
 )
 

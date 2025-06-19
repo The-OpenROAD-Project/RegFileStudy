@@ -30,23 +30,23 @@ register_toolchains(
 bazel_dep(
     name = "rules_python",
     version = "1.3.0",
-    # reduce namespace collisions by prefixing with openroad
-    repo_name = "openroad_rules_python",
+    # reduce namespace collisions by prefixing with regfilestudy
+    repo_name = "regfilestudy_rules_python",
 )
 
-python = use_extension("@openroad_rules_python//python/extensions:python.bzl", "python")
+python = use_extension("@regfilestudy_rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     ignore_root_user_error = True,
     python_version = "3.13",
 )
 
-pip = use_extension("@openroad_rules_python//python/extensions:pip.bzl", "pip")
+pip = use_extension("@regfilestudy_rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
-    hub_name = "openroad-pip",
+    hub_name = "regfilestudy-pip",
     python_version = "3.13",
     requirements_lock = "//:requirements_lock.txt",
 )
-use_repo(pip, "openroad-pip")
+use_repo(pip, "regfilestudy-pip")
 
 bazel_dep(name = "bazel-orfs")
 
@@ -93,7 +93,7 @@ scala_deps.scalatest()
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
-    name = "openroad_maven",
+    name = "regfilestudy_maven",
     artifacts = [
         "org.chipsalliance:chisel_2.13:7.0.0-RC1+22-2cb90ea2-SNAPSHOT",
         "org.chipsalliance:chisel-plugin_2.13.16:7.0.0-RC1+22-2cb90ea2-SNAPSHOT",
@@ -108,7 +108,7 @@ maven.install(
         "https://repo1.maven.org/maven2",
     ],
 )
-use_repo(maven, "openroad_maven")
+use_repo(maven, "regfilestudy_maven")
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
