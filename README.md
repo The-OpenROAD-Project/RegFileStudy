@@ -4,6 +4,19 @@ A minimalistic example of an architectural study of a register file using the to
 
 This illustrates the power of Bazel to create easy to use, once you have mastered it, what would be a complex setup using ad-hoc bash scripts, Docker, apt install, python pip install, etc.
 
+## 📊 Register File Study Flow
+
+```mermaid
+graph TD
+  Bazel["🛠️ Bazel<br/>From a dictinary in BUILD, creates a .json file with study details"]
+  RegFile["📘 RegFile.scala<br/>Generates register file variants based on the .json generated above"]
+  Verilog["📄 Verilog Modules<br/>Produced by Chisel"]
+  OpenROAD["🏗️ OpenROAD<br/>Runs CTS + results.tcl to generate results.yaml for each register file"]
+  Plot["📈 plot_results.py<br/>Plots results from YAML files"]
+
+  Bazel --> RegFile --> Verilog --> OpenROAD --> Plot
+```
+
 ## Register port cost study
 
 In this simple architectural example study, the number of instances for a read port vs. a write port for a register file is studied. This is to help build an intuitive understanding if, given a choice, it is better to add read ports or write ports.
