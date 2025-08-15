@@ -9,13 +9,25 @@ load("//:chisel.bzl", "chisel_binary")
 
 LATENCIES = [i for i in range(15)]
 
-STUDY = [{
-    "name": "Multiplier_{i}".format(
-        i = i,
-    ),
-    "width": 64,
-    "latency": i,
-} for i in LATENCIES]
+STUDY = [
+    {
+        "name": "Multiplier_{i}_{retime}".format(
+            i = i,
+            retime = retime,
+        ),
+        "top": "Multiplier_{i}".format(
+            i = i,
+        ),
+        "width": 64,
+        "latency": i,
+        "retime": retime,
+    }
+    for i in LATENCIES
+    for retime in [
+        1,
+        0,
+    ]
+]
 
 NAMES = [study["name"] for study in STUDY]
 
@@ -62,7 +74,7 @@ genrule(
 )
 
 [orfs_flow(
-    name = name,
+    name = study["name"],
     # Some simple parameters, we don't care about physical size, we're counting
     # instances.
     arguments = {
@@ -81,33 +93,47 @@ genrule(
         # Normal parameters
         "PLACE_DENSITY": "0.40",
         "CORE_UTILIZATION": "20",
-        "SYNTH_RETIME_MODULES": name,
+        "SYNTH_RETIME_MODULES": study["top"] if study["retime"] == 1 else "",
     },
     sources = {
         "SDC_FILE": ["//:constraints.sdc"],
     },
+    top = study["top"],
+    variant = "retimed" if study["retime"] == 1 else "base",
     verilog_files = [":generate_verilog"],
-) for name in NAMES]
+) for study in STUDY]
 
 [
     orfs_run(
-        name = "{base}_results".format(base = name),
+        name = "{name}_results".format(
+            name = study["name"],
+        ),
         # count instances after cts, more than accurate enough and faster
-        src = "{name}_cts".format(name = name),
+        src = "{name}_{variant}synth".format(
+            name = study["name"],
+            variant = "retimed_" if study["retime"] == 1 else "",
+        ),
         outs = [
-            "{name}_stats".format(name = name),
+            "{name}_stats".format(
+                name = study["name"],
+            ),
         ],
         arguments = {
-            "OUTPUT": "$(location :{name}_stats)".format(name = name),
+            "NAME": study["name"],
+            "OUTPUT": "$(location :{name}_stats)".format(
+                name = study["name"],
+            ),
         },
         script = "//:results.tcl",
     )
-    for name in NAMES
+    for study in STUDY
 ]
 
 filegroup(
     name = "results",
-    srcs = [":{name}_results".format(name = name) for name in NAMES],
+    srcs = [":{name}_results".format(
+        name = study["name"],
+    ) for study in STUDY],
     visibility = ["//visibility:public"],
 )
 

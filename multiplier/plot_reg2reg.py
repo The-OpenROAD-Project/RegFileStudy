@@ -27,16 +27,19 @@ def main(argv):
         if key not in exclude
     ])
 
-    # Plot latency on x axis and reg2reg_min on Y axis
-    # {'Multiplier_1': {'name': 'Multiplier_1', 'width': 2, 'latency': 1, 'in2reg_min': 184.33342, 'reg2out_min': 206.094341, 'reg2reg_min': 93.282974, 'instances': 21, 'power': 9.77e-05}, 'Multiplier_2': {'name': 'Multiplier_2', 'width': 2, 'latency': 2, 'in2reg_min': 184.33342, 'reg2out_min': 206.094341, 'reg2reg_min': 93.282974, 'instances': 29, 'power': 0.000125}, 'Multiplier_4': {'name': 'Multiplier_4', 'width': 2, 'latency': 4, 'in2reg_min': 184.33342, 'reg2out_min': 206.094341, 'reg2reg_min': 93.282974, 'instances': 45, 'power': 0.000175}, 'Multiplier_8': {'name': 'Multiplier_8', 'width': 2, 'latency': 8, 'in2reg_min': 184.33342, 'reg2out_min': 206.094341, 'reg2reg_min': 100.725403, 'instances': 78, 'power': 0.000271}, 'Multiplier_16': {'name': 'Multiplier_16', 'width': 2, 'latency': 16, 'in2reg_min': 184.33342, 'reg2out_min': 206.094341, 'reg2reg_min': 97.029221, 'instances': 144, 'power': 0.00046}}
-
+    # Plot latency on x axis and reg2reg_min on Y axis for retimed and regular
     # Plot latency on x axis and reg2reg_min on Y axis
     plt.figure()
-    for name in names:
-        plt.scatter(study[name]["latency"], study[name]["reg2reg_min"], label=name)
+
+    for name in study:
+        if study[name]["retime"] == 1:
+            plt.scatter(study[name]["latency"], study[name]["reg2reg_min"], marker='o')
+        else:
+            plt.scatter(study[name]["latency"], study[name]["reg2reg_min"], marker='x')
+
     plt.xlabel("Latency")
     plt.ylabel("Reg2Reg Min")
-    plt.title("Latency vs Reg2Reg Min")
+    plt.title("Pipeline stages vs reg2reg minimum clock period\n'o' retimed, 'x' not retimed")
     plt.legend()
     plt.savefig(output)
     plt.close()

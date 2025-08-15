@@ -4,7 +4,8 @@ set clock [lindex [all_clocks] 0]
 set clock_period [get_property $clock period]
 
 set f [open $::env(OUTPUT) a]
-puts $f "name: $::env(DESIGN_NAME)"
+puts $f "name: $::env(NAME)"
+puts $f "top: $::env(DESIGN_NAME)"
 foreach group {in2reg reg2out reg2reg} {
   set paths [find_timing_paths -path_group $group -sort_by_slack -group_path_count 1]
   set path [lindex $paths 0]

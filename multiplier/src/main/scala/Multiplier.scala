@@ -17,12 +17,14 @@ import java.nio.file.Paths
 
 case class MultiplierConfig(
     val name: String,
+    val top: String,
     val width: Int,
-    val latency: Int
+    val latency: Int,
+    val retime: Int
 )
 
 class Multiplier(config: MultiplierConfig) extends Module {
-  override def desiredName = config.name
+  override def desiredName = config.top
   val io = IO(new Bundle {
     val in = Input(Vec(2, UInt(config.width.W)))
     val out = Output(UInt(config.width.W))
@@ -42,7 +44,7 @@ class Multiplier(config: MultiplierConfig) extends Module {
 
 class Top(configs: Seq[MultiplierConfig]) extends Module {
 
-  val multipliers = configs.map { config =>
+  val multipliers = configs.filter(_.retime == 1).map { config =>
     Module(new Multiplier(config))
   }
 
