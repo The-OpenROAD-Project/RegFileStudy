@@ -5,11 +5,11 @@ set clock_period [get_property $clock period]
 
 set f [open $::env(OUTPUT) a]
 puts $f "name: $::env(DESIGN_NAME)"
-foreach group {in2reg reg2out} {
+foreach group {in2reg reg2out reg2reg} {
   set paths [find_timing_paths -path_group $group -sort_by_slack -group_path_count 1]
   set path [lindex $paths 0]
   set slack [get_property $path slack]
-  puts $f "${group}_arrival: [expr $clock_period - $slack]"
+  puts $f "${group}_min: [expr $clock_period - $slack]"
 }
 puts $f "instances: [llength [get_cells *]]"
 #puts $f "area: [sta::format_area [rsz::design_area] 0]"
