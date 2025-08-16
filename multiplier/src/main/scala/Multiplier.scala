@@ -30,16 +30,25 @@ class Multiplier(config: MultiplierConfig) extends Module {
     val out = Output(UInt(config.width.W))
   })
 
-  // Large fanout synchronous reset and pipelining
-  withReset(ShiftRegister(reset.asBool, config.latency)) {
-    // Input and output are always registered, we are plotting reg2reg paths.
-    // Latency is w.r.t. how many pipeline stages we have for multiply operation
-    // and reset.
-    val in = RegNext(io.in)
-    io.out := RegNext(
-      ShiftRegister(in.reduce(_ * _), config.latency, 0.U, true.B)
-    )
-  }
+  val core = Module(new Module {
+    override def desiredName = config.top + "_core"
+    val core_io = IO(chiselTypeOf(io))
+    // Large fanout synchronous reset and pipelining,
+    // great for testing retiming.
+    withReset(ShiftRegister(reset.asBool, config.latency)) {
+      core_io.out := ShiftRegister(
+        core_io.in.reduce(_ * _),
+        config.latency,
+        0.U,
+        true.B
+      )
+    }
+  })
+
+  // Input and output are always registered at this top level,
+  // but only the core is retimed, as we want to plot reg2reg paths.
+  io.out := RegNext(core.core_io.out)
+  core.core_io.in := RegNext(io.in)
 }
 
 class Top(configs: Seq[MultiplierConfig]) extends Module {

@@ -93,7 +93,8 @@ genrule(
         # Normal parameters
         "PLACE_DENSITY": "0.40",
         "CORE_UTILIZATION": "20",
-        "SYNTH_RETIME_MODULES": study["top"] if study["retime"] == 1 else "",
+        "SYNTH_KEEP_MODULES": (study["top"] + "_core") if study["retime"] == 1 else "",
+        "SYNTH_RETIME_MODULES": (study["top"] + "_core") if study["retime"] == 1 else "",
     },
     sources = {
         "SDC_FILE": ["//:constraints.sdc"],

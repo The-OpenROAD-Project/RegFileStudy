@@ -37,7 +37,7 @@ def main(argv):
         else:
             plt.scatter(study[name]["latency"], study[name]["reg2reg_min"], marker='x')
 
-    plt.xlabel("Latency")
+    plt.xlabel("Pipeline stages")
     plt.ylabel("Reg2Reg Min")
     plt.title("Pipeline stages vs reg2reg minimum clock period\n'o' retimed, 'x' not retimed")
     plt.legend()
