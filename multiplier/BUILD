@@ -144,6 +144,7 @@ py_binary(
     deps = [
         "@regfilestudy-pip//matplotlib",
         "@regfilestudy-pip//pyyaml",
+        "@regfilestudy-pip//scipy",
     ],
 )
 
