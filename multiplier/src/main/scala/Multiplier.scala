@@ -15,6 +15,11 @@ import scopt.RenderingMode
 import scala.collection.immutable.SeqMap
 import java.nio.file.Paths
 
+case class Info(
+    val stage: String,
+    val study: Seq[MultiplierConfig]
+)
+
 case class MultiplierConfig(
     val name: String,
     val top: String,
@@ -78,10 +83,11 @@ object GenerateMultiplierStudy extends App {
   val configs = io.circe.yaml.parser
     .parse(new String(java.nio.file.Files.readAllBytes(jsonInput), "UTF-8"))
     .getOrElse(throw new RuntimeException("Failed to parse YAML"))
-    .as[Seq[MultiplierConfig]]
+    .as[Info]
     .getOrElse(
       throw new RuntimeException("Failed to decode YAML to MultiplierConfig")
     )
+    .study
 
   ChiselStage.emitSystemVerilog(
     new Top(configs),

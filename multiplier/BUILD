@@ -7,7 +7,7 @@ load("//:chisel.bzl", "chisel_binary")
 #load("@rules_verilator//verilator:defs.bzl", "verilator_cc_library")
 #load("@rules_verilator//verilog:defs.bzl", "verilog_library")
 
-LATENCIES = [i for i in range(15)]
+LATENCIES = [i for i in range(11)]
 
 STUDY = [
     {
@@ -31,10 +31,15 @@ STUDY = [
 
 NAMES = [study["name"] for study in STUDY]
 
+INFO = {
+    "stage": "synth",
+    "study": STUDY,
+}
+
 # Write out a .jsonfile with the study parameters.
 write_binary(
     name = "study",
-    data = str(STUDY),
+    data = str(INFO),
 )
 
 chisel_binary(
@@ -110,8 +115,9 @@ genrule(
             name = study["name"],
         ),
         # count instances after cts, more than accurate enough and faster
-        src = "{name}_{variant}synth".format(
+        src = "{name}_{variant}{stage}".format(
             name = study["name"],
+            stage = INFO["stage"],
             variant = "retimed_" if study["retime"] == 1 else "",
         ),
         outs = [

@@ -12,9 +12,9 @@ def inv_func_thru_zero(x, a, y0):
 def main(argv):
     output = argv[0]
     with open(argv[1], "r") as file:
-        study_list = json.load(file)
+        info = json.load(file)
 
-    study = {study["name"]: study for study in study_list}
+    study = {study["name"]: study for study in info["study"]}
 
     for file in argv[2:]:
         with open(file, "r") as f:
@@ -73,7 +73,7 @@ def main(argv):
 
     plt.xlabel("Pipeline stages")
     plt.ylabel("Reg2Reg Min")
-    plt.title("Pipeline stages vs reg2reg minimum clock period\n'o' retimed, 'x' not retimed")
+    plt.title(f"{info['stage']} minimum clock period")
     plt.legend()
     plt.savefig(output)
     plt.close()
