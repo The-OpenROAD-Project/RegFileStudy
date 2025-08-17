@@ -113,6 +113,7 @@ genrule(
         ],
         arguments = {
             "OUTPUT": "$(location :{name}_stats)".format(name = name),
+            "NAME": name,
         },
         script = ":results.tcl",
     )
