@@ -70,4 +70,6 @@ A 64x64 bit multiplier with synchronous reset flip-flops is instantiated with 0-
     bazelisk run //multiplier:plot
     xdg-open bazel-bin/multiplier/plot.pdf
 
-![Retiming and pipeline stages](reg2reg-retimed.png)
+![Retiming and pipeline stages after synthesis](synth-retime.png)
+
+![Retiming and pipeline stages after final](final-retime.png)
