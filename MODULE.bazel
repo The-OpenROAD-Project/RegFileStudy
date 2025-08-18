@@ -121,3 +121,11 @@ exports_files(glob(["bin/*"]), visibility = ["//visibility:public"])
     strip_prefix = "firtool-1.108.0",
     url = "https://github.com/llvm/circt/releases/download/firtool-1.108.0/firrtl-bin-linux-x64.tar.gz",
 )
+
+http_archive(
+    name = "berkeley_hardfloat",
+    build_file = "//multiplier:hardfloat.BUILD.bazel",
+    sha256 = "84e09620e9fb902bc63dadd5c755562ce6fea9f18dad9bc52eb98a952aeefaa5",
+    strip_prefix = "berkeley-hardfloat-109ac38f253184dbb67223cac0c3ae5408d82d7a",
+    url = "https://github.com/Pinata-Consulting/berkeley-hardfloat/archive/109ac38f253184dbb67223cac0c3ae5408d82d7a.zip",
+)

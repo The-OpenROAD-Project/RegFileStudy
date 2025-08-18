@@ -1,0 +1,5 @@
+# buildifier: disable=module-docstring
+exports_files(
+    glob(["hardfloat/src/main/scala/*.scala"]),
+    visibility = ["//visibility:public"],
+)
