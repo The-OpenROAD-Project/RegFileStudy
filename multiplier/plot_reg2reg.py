@@ -73,7 +73,7 @@ def main(argv):
 
     plt.xlabel("Pipeline stages")
     plt.ylabel("Reg2Reg Min")
-    plt.title(f"{info['stage']} minimum clock period")
+    plt.title(f"{info['name']} {info['stage']} minimum clock period")
     plt.legend()
     plt.savefig(output)
     plt.close()
