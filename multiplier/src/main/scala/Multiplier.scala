@@ -41,12 +41,9 @@ class Multiplier(config: MultiplierConfig) extends Module {
     // Large fanout synchronous reset and pipelining,
     // great for testing retiming.
     withReset(ShiftRegister(reset.asBool, config.latency)) {
-      core_io.out := ShiftRegister(
-        core_io.in.reduce(_ * _),
-        config.latency,
-        0.U,
-        true.B
-      )
+      // the pipeline registers are free-running, thus not hooked up to the
+      // synchronous reset
+      core_io.out := ShiftRegister(core_io.in.reduce(_ * _), config.latency)
     }
   })
 
