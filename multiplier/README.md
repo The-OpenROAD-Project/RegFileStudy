@@ -73,3 +73,14 @@ A 64x64 bit multiplier with synchronous reset flip-flops is instantiated with 0-
 ![Retiming and pipeline stages after synthesis](synth-retime.png)
 
 ![Retiming and pipeline stages after final](final-retime.png)
+
+
+## FloatingPointUnit
+
+[Berkely hardfloat](https://github.com/ucb-bar/berkeley-hardfloat)
+
+    bazelisk build //multiplier:fpu_plot
+
+![alt text](fpu-synth.png)
+
+![alt text](fpu-grt.png)
