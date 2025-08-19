@@ -40,7 +40,7 @@ py_binary(
 study(
     name = "multiplier",
     info = INFO,
-    main_class = "GenerateMultiplierStudy",
+    module = "Multiplier",
     scala_files = glob(["src/main/scala/**/*.scala"]),
 )
 
@@ -92,6 +92,6 @@ MULTIPLIER_INFO = {
 study(
     name = "fpu",
     info = MULTIPLIER_INFO,
-    main_class = "GenerateFloatingPointUnitStudy",
+    module = "FloatingPointUnit",
     scala_files = glob(["src/main/scala/**/*.scala"]),
 )

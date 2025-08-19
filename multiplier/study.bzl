@@ -6,7 +6,7 @@ load("@bazel-orfs//:openroad.bzl", "orfs_flow", "orfs_run")
 load("@bazel-orfs//:write_binary.bzl", "write_binary")
 load("//:chisel.bzl", "chisel_binary")
 
-def study(name, info, scala_files, main_class):
+def study(name, info, scala_files, module):
     """
     Create a study for the given parameters.
 
@@ -14,7 +14,7 @@ def study(name, info, scala_files, main_class):
         name: The name of the study.
         info: The information about the study.
         scala_files: The Scala files to include in the study.
-        main_class: The main class to use for the study.
+        module: The module to use for the study.
     """
 
     # Write out a .jsonfile with the study parameters.
@@ -26,7 +26,7 @@ def study(name, info, scala_files, main_class):
     chisel_binary(
         name = "{name}_generate_study".format(name = name),
         srcs = scala_files,
-        main_class = main_class,
+        main_class = "GenerateStudy",
         scalacopts = ["-Ytasty-reader"],
         deps = [
             "@regfilestudy_maven//:com_chuusai_shapeless_2_13",
@@ -49,10 +49,13 @@ def study(name, info, scala_files, main_class):
         ],
         cmd = """
         $(execpath :{name}_generate_study) \
+        {module} \
         $(location :{name}_study) \
-        --firtool-binary-path $(execpath @circt//:bin/firtool) -- \
+        -- \
+        --firtool-binary-path $(execpath @circt//:bin/firtool) \
+        -- \
         --default-layer-specialization=disable -o $(location :{name}_study.sv)
-        """.format(name = name),
+        """.format(name = name, module = module),
         tools = [
             ":{name}_generate_study".format(name = name),
             ":{name}_study".format(name = name),
