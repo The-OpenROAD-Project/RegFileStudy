@@ -4,7 +4,7 @@ Study retiming utility function
 
 load("@bazel-orfs//:openroad.bzl", "orfs_flow", "orfs_run")
 load("@bazel-orfs//:write_binary.bzl", "write_binary")
-load("//:chisel.bzl", "chisel_binary")
+load("@bazel-orfs//toolchains/scala:chisel.bzl", "chisel_binary")
 
 def study(name, info, scala_files, main_class):
     """
@@ -29,14 +29,14 @@ def study(name, info, scala_files, main_class):
         main_class = main_class,
         scalacopts = ["-Ytasty-reader"],
         deps = [
-            "@regfilestudy_maven//:com_chuusai_shapeless_2_13",
-            "@regfilestudy_maven//:com_github_scopt_scopt_2_13",
-            "@regfilestudy_maven//:io_circe_circe_core_2_13",
-            "@regfilestudy_maven//:io_circe_circe_generic_2_13",
-            "@regfilestudy_maven//:io_circe_circe_numbers_2_13",
-            "@regfilestudy_maven//:io_circe_circe_yaml_2_13",
-            "@regfilestudy_maven//:io_circe_circe_yaml_common_2_13",
-            "@regfilestudy_maven//:org_typelevel_cats_core_2_13",
+            "@maven//:com_chuusai_shapeless_2_13",
+            "@maven//:com_github_scopt_scopt_2_13",
+            "@maven//:io_circe_circe_core_2_13",
+            "@maven//:io_circe_circe_generic_2_13",
+            "@maven//:io_circe_circe_numbers_2_13",
+            "@maven//:io_circe_circe_yaml_2_13",
+            "@maven//:io_circe_circe_yaml_common_2_13",
+            "@maven//:org_typelevel_cats_core_2_13",
             "//multiplier:hardfloat",
         ],
     )
