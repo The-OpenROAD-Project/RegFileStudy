@@ -1,7 +1,9 @@
+load("@bazel-orfs//:generate.bzl", "fir_library", "verilog_directory", "verilog_single_file_library")
 load("@bazel-orfs//:openroad.bzl", "orfs_flow", "orfs_run")
 load("@bazel-orfs//:write_binary.bzl", "write_binary")
+load("@bazel-orfs//toolchains/scala:chisel.bzl", "chisel_binary", "chisel_library")
+load("@bazel-orfs//toolchains/scala:scala_bloop.bzl", "scala_bloop")
 load("@regfilestudy_rules_python//python:pip.bzl", "compile_pip_requirements")
-load("chisel.bzl", "chisel_binary")
 
 exports_files(
     [
@@ -10,10 +12,6 @@ exports_files(
     ],
     visibility = ["//visibility:public"],
 )
-
-#load("@rules_cc//cc:defs.bzl", "cc_binary")
-#load("@rules_verilator//verilator:defs.bzl", "verilator_cc_library")
-#load("@rules_verilator//verilog:defs.bzl", "verilog_library")
 
 compile_pip_requirements(
     name = "requirements",
@@ -46,34 +44,38 @@ chisel_binary(
     main_class = "GenerateRegFileStudy",
     scalacopts = ["-Ytasty-reader"],
     deps = [
-        "@regfilestudy_maven//:com_chuusai_shapeless_2_13",
-        "@regfilestudy_maven//:com_github_scopt_scopt_2_13",
-        "@regfilestudy_maven//:io_circe_circe_core_2_13",
-        "@regfilestudy_maven//:io_circe_circe_generic_2_13",
-        "@regfilestudy_maven//:io_circe_circe_numbers_2_13",
-        "@regfilestudy_maven//:io_circe_circe_yaml_2_13",
-        "@regfilestudy_maven//:io_circe_circe_yaml_common_2_13",
-        "@regfilestudy_maven//:org_typelevel_cats_core_2_13",
+        "@maven//:com_github_scopt_scopt_2_13",
+        "@maven//:io_circe_circe_yaml_2_13",
+        "@maven//:io_circe_circe_yaml_common_2_13",
     ],
 )
 
-genrule(
-    name = "generate_verilog",
-    srcs = [],
-    outs = [
-        "study.sv",
-    ],
-    cmd = """
-    $(execpath :regfilestudy) \
-    $(location :study) \
-    --firtool-binary-path $(execpath @circt//:bin/firtool) -- \
-    --default-layer-specialization=disable -o $(location :study.sv)
-    """,
-    tools = [
+fir_library(
+    name = "generate_verilog_fir",
+    data = [
         ":regfilestudy",
         ":study",
-        "@circt//:bin/firtool",
     ],
+    generator = ":regfilestudy",
+    opts = [
+        "$(location :study)",
+        "--",
+        "--default-layer-specialization=disable",
+    ],
+    tags = ["manual"],
+)
+
+verilog_directory(
+    name = "verilog_split",
+    srcs = ["generate_verilog_fir"],
+    tags = ["manual"],
+)
+
+verilog_single_file_library(
+    name = "verilog.sv",
+    srcs = ["verilog_split"],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
 )
 
 [orfs_flow(
@@ -100,7 +102,7 @@ genrule(
     sources = {
         "SDC_FILE": [":constraints.sdc"],
     },
-    verilog_files = [":generate_verilog"],
+    verilog_files = [":verilog.sv"],
 ) for name in NAMES]
 
 [
@@ -143,10 +145,38 @@ genrule(
     ],
     outs = ["plot.pdf"],
     cmd = """
-    set -euo pipefail
+    set -euox pipefail
     $(execpath :plot_results) $(location :plot.pdf) $(location :study) $(locations :results)
     """,
     tools = [
         ":plot_results",
     ],
+)
+
+filegroup(
+    name = "chiselfiles",
+    srcs = glob(["**/*.scala"]),
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+)
+
+# This library lists all the scala files directly that
+# will be editing
+chisel_library(
+    name = "blooplib",
+    srcs = [
+        "//:chiselfiles",
+        "//multiplier:chiselfiles",
+    ],
+    tags = ["manual"],
+    deps = [
+        "//multiplier:hardfloat",
+        "@maven//:org_scalatest_scalatest_2_13",
+    ],
+)
+
+# One bloop to rule them all
+scala_bloop(
+    name = "bloop",
+    src = "blooplib",
 )

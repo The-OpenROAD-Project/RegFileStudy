@@ -9,9 +9,7 @@ import chisel3.util._
 import chisel3.stage._
 import chisel3.experimental._
 import chisel3.util.HasBlackBoxResource
-import scopt.OParser
 import System.err
-import scopt.RenderingMode
 import scala.collection.immutable.SeqMap
 import java.nio.file.Paths
 
@@ -70,9 +68,13 @@ class Top(configs: Seq[RegFileConfig]) extends Module {
 }
 
 object GenerateRegFileStudy extends App {
-  val jsonInput = Paths.get(args(0))
-  val (chiselArgs, delimiter) = args.drop(1).span(_ != "--")
-  val firtoolArgs = delimiter.tail
+  val (beforeFirstDash, afterFirstDash) = args.span(_ != "--")
+  val firtoolArgs = afterFirstDash.drop(1)
+
+  println(s"Args: ${beforeFirstDash.mkString(" ")}")
+  println(s"Firtool Args: ${firtoolArgs.mkString(" ")}")
+
+  val jsonInput = Paths.get(beforeFirstDash(0))
 
   implicit val regFileConfigEncoder: Encoder[RegFileConfig] =
     deriveEncoder[RegFileConfig]
@@ -85,10 +87,8 @@ object GenerateRegFileStudy extends App {
       throw new RuntimeException("Failed to decode YAML to RegFileConfig")
     )
 
-  ChiselStage.emitSystemVerilog(
+  ChiselStage.emitHWDialect(
     new Top(configs),
-    chiselArgs,
-    firtoolArgs
+    firtoolOpts = firtoolArgs
   )
-
 }

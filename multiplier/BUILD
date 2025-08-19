@@ -1,4 +1,4 @@
-load("//:chisel.bzl", "chisel_library")
+load("@bazel-orfs//toolchains/scala:chisel.bzl", "chisel_library")
 load(":study.bzl", "study")
 
 LATENCIES = [i for i in range(11)]
@@ -94,4 +94,11 @@ study(
     info = MULTIPLIER_INFO,
     module = "FloatingPointUnit",
     scala_files = glob(["src/main/scala/**/*.scala"]),
+)
+
+filegroup(
+    name = "chiselfiles",
+    srcs = glob(["**/*.scala"]),
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
 )

@@ -2,9 +2,10 @@
 Study retiming utility function
 """
 
+load("@bazel-orfs//:generate.bzl", "fir_library", "verilog_directory", "verilog_single_file_library")
 load("@bazel-orfs//:openroad.bzl", "orfs_flow", "orfs_run")
 load("@bazel-orfs//:write_binary.bzl", "write_binary")
-load("//:chisel.bzl", "chisel_binary")
+load("@bazel-orfs//toolchains/scala:chisel.bzl", "chisel_binary")
 
 def study(name, info, scala_files, module):
     """
@@ -29,38 +30,41 @@ def study(name, info, scala_files, module):
         main_class = "GenerateStudy",
         scalacopts = ["-Ytasty-reader"],
         deps = [
-            "@regfilestudy_maven//:com_chuusai_shapeless_2_13",
-            "@regfilestudy_maven//:com_github_scopt_scopt_2_13",
-            "@regfilestudy_maven//:io_circe_circe_core_2_13",
-            "@regfilestudy_maven//:io_circe_circe_generic_2_13",
-            "@regfilestudy_maven//:io_circe_circe_numbers_2_13",
-            "@regfilestudy_maven//:io_circe_circe_yaml_2_13",
-            "@regfilestudy_maven//:io_circe_circe_yaml_common_2_13",
-            "@regfilestudy_maven//:org_typelevel_cats_core_2_13",
+            "@maven//:com_github_scopt_scopt_2_13",
+            "@maven//:io_circe_circe_yaml_2_13",
+            "@maven//:io_circe_circe_yaml_common_2_13",
             "//multiplier:hardfloat",
         ],
     )
 
-    native.genrule(
-        name = "{name}_generate_verilog".format(name = name),
-        srcs = [],
-        outs = [
-            "{name}_study.sv".format(name = name),
-        ],
-        cmd = """
-        $(execpath :{name}_generate_study) \
-        {module} \
-        $(location :{name}_study) \
-        -- \
-        --firtool-binary-path $(execpath @circt//:bin/firtool) \
-        -- \
-        --default-layer-specialization=disable -o $(location :{name}_study.sv)
-        """.format(name = name, module = module),
-        tools = [
+    fir_library(
+        name = "{name}_fir".format(name = name),
+        data = [
             ":{name}_generate_study".format(name = name),
             ":{name}_study".format(name = name),
-            "@circt//:bin/firtool",
         ],
+        generator = "{name}_generate_study".format(name = name),
+        opts = [
+            "{module}".format(module = module),
+            "$(location :{name}_study)".format(name = name),
+            "--",
+            "--",
+            "--default-layer-specialization=disable",
+        ],
+        tags = ["manual"],
+    )
+
+    verilog_directory(
+        name = "{name}_verilog_split".format(name = name),
+        srcs = ["{name}_fir".format(name = name)],
+        tags = ["manual"],
+    )
+
+    verilog_single_file_library(
+        name = "{name}.sv".format(name = name),
+        srcs = ["{name}_verilog_split".format(name = name)],
+        tags = ["manual"],
+        visibility = ["//visibility:public"],
     )
 
     for study in info["study"]:
@@ -92,7 +96,7 @@ def study(name, info, scala_files, module):
             },
             top = study["top"],
             variant = "retimed" if study["retime"] == 1 else "base",
-            verilog_files = [":{name}_generate_verilog".format(name = name)],
+            verilog_files = [":{name}.sv".format(name = name)],
         )
 
         orfs_run(

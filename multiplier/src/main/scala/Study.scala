@@ -67,7 +67,7 @@ object GenerateStudy extends App {
 
   val constructor = Class.forName(moduleName).getConstructors().head
 
-  ChiselStage.emitSystemVerilog(
+  ChiselStage.emitHWDialect(
     new Top(
       configs,
       config =>
