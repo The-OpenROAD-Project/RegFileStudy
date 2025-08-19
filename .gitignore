@@ -17,3 +17,4 @@ bazel-RegFileStudy
 .bazelbsp
 projectview.bazelproject
 user.bazelrc
+external/
