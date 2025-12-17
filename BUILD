@@ -1,4 +1,5 @@
-load("@bazel-orfs//:generate.bzl", "fir_library", "verilog_directory", "verilog_single_file_library")
+load("@bazel-orfs//:generate.bzl", "fir_library")
+load("@bazel-orfs//:verilog.bzl", "verilog_directory", "verilog_single_file_library")
 load("@bazel-orfs//:openroad.bzl", "orfs_flow", "orfs_run")
 load("@bazel-orfs//:write_binary.bzl", "write_binary")
 load("@bazel-orfs//toolchains/scala:chisel.bzl", "chisel_binary", "chisel_library")
